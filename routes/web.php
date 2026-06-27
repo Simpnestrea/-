@@ -6,26 +6,21 @@ use App\Http\Controllers\AuthController;
 
 // 1. Trang chủ
 Route::get('/', function () {
-    $allRecipes = \App\Models\Recipe::with('category')->approved()->get();
-    $allCategories = \App\Models\Category::get();
-
-    $featuredRecipes = $allRecipes->count() >= 3 ? $allRecipes->random(3) : $allRecipes;
-    $categories = $allCategories->count() >= 4 ? $allCategories->random(4) : $allCategories;
-    $famousRecipes = $allRecipes->sortByDesc('id')->take(12)->values();
+    $featuredRecipes = \App\Models\Recipe::with('category')->approved()->inRandomOrder()->take(3)->get();
+    $categories = \App\Models\Category::inRandomOrder()->take(4)->get();
+    $famousRecipes = \App\Models\Recipe::with('category')->approved()->orderBy('id', 'desc')->take(12)->get();
     
-    $easyRecipes = $allRecipes->filter(fn($r) => $r->difficulty === 'dễ');
-    $easyRecipes = $easyRecipes->count() >= 12 ? $easyRecipes->random(12) : $easyRecipes->values();
+    $easyRecipes = \App\Models\Recipe::with('category')->approved()->where('difficulty', 'dễ')->inRandomOrder()->take(12)->get();
+    
+    $quickRecipes = \App\Models\Recipe::with('category')->approved()->where('time_to_cook', '<=', 30)->inRandomOrder()->take(12)->get();
 
-    $quickRecipes = $allRecipes->filter(fn($r) => $r->time_to_cook <= 30);
-    $quickRecipes = $quickRecipes->count() >= 12 ? $quickRecipes->random(12) : $quickRecipes->values();
-
-    $premiumRecipes = $allRecipes->filter(fn($r) => $r->is_premium && $r->price > 0)
-        ->loadCount(['likedByUsers', 'savedByUsers', 'comments'])
-        ->sortByDesc(function ($recipe) {
-            return $recipe->liked_by_users_count + $recipe->saved_by_users_count + $recipe->comments_count;
-        })
+    $premiumRecipes = \App\Models\Recipe::with('category')->approved()
+        ->where('is_premium', true)
+        ->where('price', '>', 0)
+        ->withCount(['likedByUsers', 'savedByUsers', 'comments'])
+        ->orderByRaw('(liked_by_users_count + saved_by_users_count + comments_count) DESC')
         ->take(10)
-        ->values();
+        ->get();
 
     return view('welcome', compact('featuredRecipes', 'categories', 'famousRecipes', 'easyRecipes', 'quickRecipes', 'premiumRecipes'));
 })->name('home');

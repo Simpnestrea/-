@@ -53,6 +53,14 @@ class WalletController extends Controller
         $user = auth()->user();
         $user->increment('balance', $amount);
 
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Nạp tiền vào ví thành công! +' . number_format($amount, 0, ',', '.') . ' đ',
+                'balance' => $user->balance
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Nạp tiền vào ví thành công! +' . number_format($amount, 0, ',', '.') . ' đ');
     }
 

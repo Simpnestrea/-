@@ -1,27 +1,28 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Ví của tôi - Foodball'); ?>
+<?php $__env->startSection('header_title', 'Ví của tôi'); ?>
 
-@section('title', 'Ví của tôi - Foodball')
-@section('header_title', 'Ví của tôi')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
 <div class="flex-1 w-full max-w-7xl mx-auto p-6 space-y-8 bg-white shadow-sm border border-gray-100 rounded-2xl my-6 mx-auto relative">
     
     <!-- Thông báo kết quả -->
-    @if(session('success'))
+    <?php if(session('success')): ?>
         <div class="p-4 text-sm text-green-800 rounded-2xl bg-green-50 border border-green-200" role="alert">
-            <span class="font-bold">Thành công!</span> {{ session('success') }}
+            <span class="font-bold">Thành công!</span> <?php echo e(session('success')); ?>
+
         </div>
-    @endif
-    @if(session('error'))
+    <?php endif; ?>
+    <?php if(session('error')): ?>
         <div class="p-4 text-sm text-red-800 rounded-2xl bg-red-50 border border-red-200" role="alert">
-            <span class="font-bold">Lỗi!</span> {{ session('error') }}
+            <span class="font-bold">Lỗi!</span> <?php echo e(session('error')); ?>
+
         </div>
-    @endif
-    @if($errors->any())
+    <?php endif; ?>
+    <?php if($errors->any()): ?>
         <div class="p-4 text-sm text-red-800 rounded-2xl bg-red-50 border border-red-200" role="alert">
-            <span class="font-bold">Lỗi!</span> {{ $errors->first() }}
+            <span class="font-bold">Lỗi!</span> <?php echo e($errors->first()); ?>
+
         </div>
-    @endif
+    <?php endif; ?>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
@@ -40,13 +41,13 @@
                 
                 <div class="z-10">
                     <span class="text-xs opacity-75 font-semibold">Số dư khả dụng</span>
-                    <h2 class="text-3xl font-black mt-1 font-mono tracking-tight">{{ number_format($user->balance, 0, ',', '.') }} đ</h2>
+                    <h2 class="text-3xl font-black mt-1 font-mono tracking-tight"><?php echo e(number_format($user->balance, 0, ',', '.')); ?> đ</h2>
                 </div>
                 
                 <div class="flex justify-between items-end z-10">
                     <div>
                         <span class="text-[10px] opacity-75 uppercase block leading-none">Chủ ví</span>
-                        <span class="text-sm font-bold tracking-wide">{{ $user->name }}</span>
+                        <span class="text-sm font-bold tracking-wide"><?php echo e($user->name); ?></span>
                     </div>
                     <div class="w-10 h-6 bg-white/20 rounded-md backdrop-blur-sm flex items-center justify-center text-[10px] font-black uppercase">
                         VND
@@ -105,7 +106,7 @@
                             
                             <div class="relative w-48 h-48 mx-auto rounded-xl overflow-hidden border border-gray-200 bg-white flex items-center justify-center shadow-sm p-2">
                                 <!-- Hiển thị QR. -->
-                                <img src="{{ asset('qr.jpg') }}" alt="QR Code" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Demo';">
+                                <img src="<?php echo e(asset('qr.jpg')); ?>" alt="QR Code" class="w-full h-full object-contain" onerror="this.onerror=null; this.src='https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Demo';">
                             </div>
 
                             <div class="flex gap-3 pt-4">
@@ -114,12 +115,12 @@
                                 </button>
                                 <button type="button" @click="
                                     loading = true; 
-                                    fetch('{{ route('wallet.deposit') }}', {
+                                    fetch('<?php echo e(route('wallet.deposit')); ?>', {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',
                                             'Accept': 'application/json',
-                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                            'X-CSRF-TOKEN': '<?php echo e(csrf_token()); ?>'
                                         },
                                         body: JSON.stringify({ amount: amount })
                                     }).then(() => {
@@ -162,10 +163,10 @@
             <!-- Tabs Menu -->
             <div class="flex border-b border-gray-200">
                 <button @click="tab = 'purchases'" :class="tab === 'purchases' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="flex-1 text-center py-4 border-b-2 font-bold text-sm transition">
-                    🛍️ Lịch sử mua hàng ({{ $purchases->count() }})
+                    🛍️ Lịch sử mua hàng (<?php echo e($purchases->count()); ?>)
                 </button>
                 <button @click="tab = 'earnings'" :class="tab === 'earnings' ? 'border-orange-500 text-orange-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="flex-1 text-center py-4 border-b-2 font-bold text-sm transition">
-                    📈 Lịch sử thu nhập ({{ $earnings->count() }})
+                    📈 Lịch sử thu nhập (<?php echo e($earnings->count()); ?>)
                 </button>
             </div>
 
@@ -182,57 +183,60 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-150 text-sm text-gray-600">
-                            @forelse($purchases as $item)
+                            <?php $__empty_1 = true; $__currentLoopData = $purchases; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr class="hover:bg-gray-50/50 transition">
                                     <td class="px-6 py-4 font-bold text-gray-800">
                                         <div class="flex flex-col">
-                                            <a href="{{ route('recipe.detail', $item->slug) }}" class="hover:text-orange-500 transition">
-                                                {{ $item->title }}
+                                            <a href="<?php echo e(route('recipe.detail', $item->slug)); ?>" class="hover:text-orange-500 transition">
+                                                <?php echo e($item->title); ?>
+
                                             </a>
-                                            @if($item->pivot->price == 0)
-                                                @if(\Carbon\Carbon::parse($item->pivot->created_at)->addHours(24)->isPast())
+                                            <?php if($item->pivot->price == 0): ?>
+                                                <?php if(\Carbon\Carbon::parse($item->pivot->created_at)->addHours(24)->isPast()): ?>
                                                     <span class="inline-flex items-center gap-1 text-[10px] font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-md mt-1 w-max">
                                                         ⏳ Đã hết hạn (24h)
                                                     </span>
-                                                @else
+                                                <?php else: ?>
                                                     <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 w-max border border-emerald-250/50">
                                                         ⚡ Đang mở khóa (Ad)
                                                     </span>
-                                                @endif
-                                            @else
+                                                <?php endif; ?>
+                                            <?php else: ?>
                                                 <span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md mt-1 w-max border border-amber-250/50">
                                                     👑 Đã mua vĩnh viễn
                                                 </span>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-xs font-semibold text-gray-500">
-                                        {{ $item->user->name ?? 'Không rõ' }}
+                                        <?php echo e($item->user->name ?? 'Không rõ'); ?>
+
                                     </td>
                                     <td class="px-6 py-4 font-bold text-right text-red-500 font-mono">
-                                        @if($item->pivot->price > 0)
-                                            -{{ number_format($item->pivot->price, 0, ',', '.') }} đ
-                                        @else
+                                        <?php if($item->pivot->price > 0): ?>
+                                            -<?php echo e(number_format($item->pivot->price, 0, ',', '.')); ?> đ
+                                        <?php else: ?>
                                             <span class="text-gray-450 font-bold text-xs">Mở bằng Ad 📺</span>
-                                        @endif
+                                        <?php endif; ?>
                                     </td>
                                     <td class="px-6 py-4 text-right text-xs font-medium">
-                                        @if($item->pivot->price > 0)
+                                        <?php if($item->pivot->price > 0): ?>
                                             <span class="text-amber-500 font-bold">♾️ Vĩnh viễn</span>
-                                        @else
+                                        <?php else: ?>
                                             <span class="text-gray-400">
-                                                Hết hạn: {{ \Carbon\Carbon::parse($item->pivot->created_at)->addHours(24)->format('H:i d/m/Y') }}
+                                                Hết hạn: <?php echo e(\Carbon\Carbon::parse($item->pivot->created_at)->addHours(24)->format('H:i d/m/Y')); ?>
+
                                             </span>
-                                        @endif
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
-                            @empty
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>
                                     <td colspan="4" class="px-6 py-12 text-center text-gray-400 italic">
                                         Bạn chưa mua công thức nấu ăn nào.
                                     </td>
                                 </tr>
-                            @endforelse
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -251,42 +255,45 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-150 text-sm text-gray-600">
-                            @forelse($earnings as $item)
+                            <?php $__empty_1 = true; $__currentLoopData = $earnings; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr class="hover:bg-gray-50/50 transition">
                                     <td class="px-6 py-4 font-bold text-gray-800">
-                                        <a href="{{ route('recipe.detail', $item->recipe_slug) }}" class="hover:text-orange-500 transition">
-                                            {{ $item->recipe_title }}
+                                        <a href="<?php echo e(route('recipe.detail', $item->recipe_slug)); ?>" class="hover:text-orange-500 transition">
+                                            <?php echo e($item->recipe_title); ?>
+
                                         </a>
                                     </td>
                                     <td class="px-6 py-4 text-xs font-semibold text-gray-500">
-                                        {{ $item->buyer_name }}
+                                        <?php echo e($item->buyer_name); ?>
+
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        @php
+                                        <?php
                                             $taxRate = $user->is_premium ? 0.01 : 0.05;
                                             $taxAmount = $item->price * $taxRate;
                                             $netEarnings = $item->price - $taxAmount;
-                                        @endphp
+                                        ?>
                                         <div class="flex flex-col items-end">
                                             <span class="font-bold text-emerald-600 font-mono">
-                                                +{{ number_format($netEarnings, 0, ',', '.') }} đ
+                                                +<?php echo e(number_format($netEarnings, 0, ',', '.')); ?> đ
                                             </span>
                                             <span class="text-[10px] text-gray-400 font-semibold mt-0.5">
-                                                (Đã trừ {{ $taxRate * 100 }}% thuế: {{ number_format($taxAmount, 0, ',', '.') }} đ)
+                                                (Đã trừ <?php echo e($taxRate * 100); ?>% thuế: <?php echo e(number_format($taxAmount, 0, ',', '.')); ?> đ)
                                             </span>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 text-right text-xs text-gray-400 font-medium">
-                                        {{ \Carbon\Carbon::parse($item->created_at)->format('H:i d/m/Y') }}
+                                        <?php echo e(\Carbon\Carbon::parse($item->created_at)->format('H:i d/m/Y')); ?>
+
                                     </td>
                                 </tr>
-                            @empty
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>
                                     <td colspan="4" class="px-6 py-12 text-center text-gray-400 italic">
                                         Chưa có thành viên nào mua công thức nấu ăn của bạn.
                                     </td>
                                 </tr>
-                            @endforelse
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -297,4 +304,6 @@
     </div>
 
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH E:\--main\resources\views/wallet/index.blade.php ENDPATH**/ ?>
