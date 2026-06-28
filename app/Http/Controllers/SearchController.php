@@ -58,11 +58,13 @@ class SearchController extends Controller
         // Load helper data for selectors
         $categories = Category::all();
         
-        // Get popular ingredients by counting their recipes in the DB
-        $popularIngredients = Ingredient::withCount('recipes')
-            ->orderBy('recipes_count', 'desc')
-            ->take(12)
-            ->get();
+        // Get popular ingredients by counting their recipes in the DB (Cached for 1 hour)
+        $popularIngredients = \Illuminate\Support\Facades\Cache::remember('popular_ingredients', 3600, function () {
+            return Ingredient::withCount('recipes')
+                ->orderBy('recipes_count', 'desc')
+                ->take(12)
+                ->get();
+        });
 
         return view('search', compact('query', 'type', 'recipes', 'categories', 'popularIngredients'));
     }

@@ -524,10 +524,18 @@ class RecipeController extends Controller
                 ]);
             }
 
+            // Lấy danh sách các ảnh cũ vẫn được giữ lại (không bị ghi đè bởi ảnh mới)
+            $keptOldImages = [];
+            foreach ($request->steps as $index => $stepData) {
+                if (!empty($stepData['old_image']) && !$request->hasFile("steps.{$index}.image")) {
+                    $keptOldImages[] = $stepData['old_image'];
+                }
+            }
+
             // 4. Cập nhật các bước nấu ăn (Xóa các bước cũ và lưu các bước mới)
-            // Đầu tiên, xóa ảnh các bước cũ
+            // Chỉ xóa ảnh vật lý của các bước nếu ảnh đó không nằm trong danh sách được giữ lại
             foreach ($recipe->steps as $oldStep) {
-                if ($oldStep->image) {
+                if ($oldStep->image && !in_array($oldStep->image, $keptOldImages)) {
                     $oldStepPath = str_replace('/storage/', '', $oldStep->image);
                     Storage::disk('public')->delete($oldStepPath);
                 }
@@ -542,11 +550,6 @@ class RecipeController extends Controller
                 
                 // Nếu tải lên ảnh mới cho bước này
                 if (isset($stepData['image']) && $request->hasFile("steps.{$index}.image")) {
-                    // Xóa ảnh cũ cụ thể nếu có
-                    if ($stepImageUrl) {
-                        $oldStepPath = str_replace('/storage/', '', $stepImageUrl);
-                        Storage::disk('public')->delete($oldStepPath);
-                    }
                     $stepPath = $request->file("steps.{$index}.image")->store('steps', 'public');
                     $stepImageUrl = Storage::url($stepPath);
                 }

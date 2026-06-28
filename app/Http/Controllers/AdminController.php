@@ -72,14 +72,14 @@ class AdminController extends Controller
         }
 
         $recentRegistrations = User::where('created_at', '>=', now()->subDays(15))
+            ->selectRaw('DATE(created_at) as date, count(*) as total')
+            ->groupBy('date')
             ->get()
-            ->groupBy(function($user) {
-                return $user->created_at->format('Y-m-d');
-            });
+            ->pluck('total', 'date');
 
-        foreach ($recentRegistrations as $date => $usersGroup) {
+        foreach ($recentRegistrations as $date => $total) {
             if (isset($registrations[$date])) {
-                $registrations[$date] = $usersGroup->count();
+                $registrations[$date] = $total;
             }
         }
 
