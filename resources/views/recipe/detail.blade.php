@@ -49,7 +49,7 @@
                 auth()->user()->isAdmin() ||
                 auth()->user()->is_premium ||
                 auth()->user()->purchasedRecipes()
-                    ->where('recipe_id', $recipe->id)
+                    ->where('recipe_user_purchases.recipe_id', $recipe->id)
                     ->where(function ($q) {
                         $q->where('recipe_user_purchases.price', '>', 0)
                           ->orWhere(function ($sub) {
