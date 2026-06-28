@@ -12,9 +12,7 @@
             <div class="relative flex-1">
                 <input type="text" name="query" value="{{ $query }}" placeholder="Tìm theo tên, username, email..." 
                     class="w-full py-2.5 pl-10 pr-4 rounded-xl border border-slate-200 outline-none text-sm transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10"
-                    oninput="clearTimeout(window.searchTimeout); window.searchTimeout = setTimeout(() => { this.form.submit(); }, 600)"
-                    {{ $query ? 'autofocus' : '' }}
-                    onfocus="var val=this.value; this.value=''; this.value=val;">
+                    {{ $query ? 'autofocus' : '' }}>
                 <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                 </div>
@@ -23,13 +21,13 @@
                 @endif
             </div>
             
-            <select name="admin_role" onchange="this.form.submit()" class="py-2.5 pl-4 pr-10 rounded-xl border border-slate-200 outline-none text-sm transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
+            <select name="admin_role" class="py-2.5 pl-4 pr-10 rounded-xl border border-slate-200 outline-none text-sm transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
                 <option value="">Tất cả vai trò</option>
                 <option value="admin" {{ ($adminRole ?? '') === 'admin' ? 'selected' : '' }}>Chỉ Admin</option>
                 <option value="user" {{ ($adminRole ?? '') === 'user' ? 'selected' : '' }}>Chỉ Người dùng</option>
             </select>
 
-            <select name="role" onchange="this.form.submit()" class="py-2.5 pl-4 pr-10 rounded-xl border border-slate-200 outline-none text-sm transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
+            <select name="role" class="py-2.5 pl-4 pr-10 rounded-xl border border-slate-200 outline-none text-sm transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
                 <option value="">Tất cả cấp bậc</option>
                 <option value="beginner" {{ ($role ?? '') === 'beginner' ? 'selected' : '' }}>🔰 Người mới (Beginner)</option>
                 <option value="homecook" {{ ($role ?? '') === 'homecook' ? 'selected' : '' }}>🍳 Đầu bếp tại gia (Home Cook)</option>
@@ -37,11 +35,13 @@
                 <option value="masterchef" {{ ($role ?? '') === 'masterchef' ? 'selected' : '' }}>👑 Siêu đầu bếp (Master Chef)</option>
             </select>
 
-            <select name="status" onchange="this.form.submit()" class="py-2.5 pl-4 pr-10 rounded-xl border border-slate-200 outline-none text-sm transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
+            <select name="status" class="py-2.5 pl-4 pr-10 rounded-xl border border-slate-200 outline-none text-sm transition-all focus:border-orange-500 focus:ring-4 focus:ring-orange-500/10">
                 <option value="">Tất cả gói</option>
                 <option value="premium" {{ ($status ?? '') === 'premium' ? 'selected' : '' }}>Gói Premium 👑</option>
                 <option value="free" {{ ($status ?? '') === 'free' ? 'selected' : '' }}>Gói Thường</option>
             </select>
+
+            <button type="submit" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-2.5 rounded-xl transition shadow-lg shadow-orange-500/20 text-sm whitespace-nowrap">Lọc</button>
         </form>
         
         <div class="text-xs text-slate-400 font-bold uppercase tracking-wider shrink-0 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-lg">
@@ -135,7 +135,7 @@
                                 <div class="flex items-center justify-end space-x-2">
                                     
                                     <!-- View detail button -->
-                                    <button @click="showDetail({{ $user->id }})" class="font-bold text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition">
+                                    <button type="button" @click="showDetail({{ $user->id }})" class="font-bold text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition">
                                         Xem chi tiết
                                     </button>
 
@@ -206,7 +206,7 @@
         <div class="flex min-h-full items-center justify-center p-4">
             <div class="relative w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 transition-all max-h-[85vh] flex flex-col overflow-hidden">
                 <!-- Close Button -->
-                <button @click="detailModal = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition z-10">
+                <button type="button" @click="detailModal = false" class="absolute top-5 right-5 text-slate-400 hover:text-slate-600 transition z-10 bg-white/80 p-1.5 rounded-full border border-slate-100 shadow-sm">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
 
@@ -396,20 +396,31 @@
                 this.userDetail = null;
                 
                 fetch(`/admin/users/${userId}/detail`, {
+                    credentials: 'same-origin',
                     headers: {
                         'Accept': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     }
                 })
-                .then(res => res.json())
+                .then(async res => {
+                    if (!res.ok) {
+                        throw new Error('HTTP ' + res.status);
+                    }
+                    return res.json();
+                })
                 .then(data => {
-                    this.userDetail = data;
+                    if (data && data.user) {
+                        this.userDetail = data;
+                    } else {
+                        throw new Error('Dữ liệu không hợp lệ');
+                    }
                     this.loadingDetail = false;
                 })
                 .catch(err => {
                     console.error(err);
                     this.loadingDetail = false;
-                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Không thể tải chi tiết thành viên', type: 'error' } }));
+                    this.detailModal = false;
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Không thể tải chi tiết: ' + err.message, type: 'error' } }));
                 });
             },
             

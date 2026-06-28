@@ -6,6 +6,7 @@
     <title>@yield('title', 'Admin Dashboard - Foodball')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
         body { font-family: 'Outfit', sans-serif; }
@@ -67,7 +68,7 @@
                         $pendingReportsCount = \App\Models\CommentReport::count();
                     @endphp
                     @if($pendingReportsCount > 0)
-                        <span class="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full animate-bounce">{{ $pendingReportsCount }}</span>
+                        <span class="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{{ $pendingReportsCount }}</span>
                     @endif
                 </div>
             </a>
@@ -111,7 +112,7 @@
             
             <div class="flex items-center space-x-3">
                 <span class="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200/60 flex items-center gap-1.5 shadow-sm">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                     Hệ thống Online
                 </span>
             </div>
@@ -207,4 +208,3 @@
     @stack('scripts')
 </body>
 </html>
-
