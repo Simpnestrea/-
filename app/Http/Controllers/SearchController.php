@@ -37,7 +37,9 @@ class SearchController extends Controller
             $type = $query ? 'dish' : 'category';
         }
 
-        // Determine which strategy to use
+        // [BẢN PHAO BẢO VỆ ĐỒ ÁN - STRATEGY PATTERN]
+        // -> ĐÂY LÀ "CONTEXT": Lớp RecipeService đóng vai trò là Context chứa chiến lược.
+        // Dựa vào input của User, hệ thống quyết định chọn thuật toán tìm kiếm nào (ByTitle, ByCategory...).
         $strategy = match ($type) {
             'category' => new SearchByCategory(),
             'ingredient' => new SearchByIngredient(),
@@ -46,11 +48,12 @@ class SearchController extends Controller
             default => new SearchByTitle(), // 'dish' or anything else
         };
 
+        // -> GỌI "setStrategy": Nhúng (Inject) thuật toán vừa chọn vào Context
         $this->recipeService->setStrategy($strategy);
 
         $recipesQuery = Recipe::with(['user', 'category', 'ingredients'])->approved();
         
-        // Execute the strategy
+        // -> "EXECUTE (Thực thi)": Context chạy thuật toán tìm kiếm mà không cần biết logic bên trong từng file Strategy viết gì.
         $recipesQuery = $this->recipeService->searchRecipe($recipesQuery, $query, $request);
 
         $recipes = $recipesQuery->orderBy('id', 'desc')->get();

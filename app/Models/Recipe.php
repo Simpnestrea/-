@@ -76,6 +76,8 @@ class Recipe extends Subject
     public function like(User $user)
     {
         $message = "Người dùng {$user->name} đã thích công thức '{$this->title}' của bạn.";
+        // [BẢN PHAO BẢO VỆ ĐỒ ÁN - OBSERVER PATTERN]
+        // -> ĐÂY LÀ HÀM "notify()" CỦA SUBJECT: Nó sẽ lặp qua tất cả Observer đang theo dõi và gọi hàm update() để bắn thông báo.
         $this->notify($message);
     }
 

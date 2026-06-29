@@ -22,6 +22,9 @@ class RecipeContext
 
     public function setState(RecipeState $state): void
     {
+        // [BẢN PHAO BẢO VỆ ĐỒ ÁN - STATE PATTERN]
+        // -> Đây là hàm chuyển đổi trạng thái (Transition). 
+        // Khi State gọi hàm này, Context sẽ cập nhật trạng thái mới.
         $this->state = $state;
         
         // Cập nhật Database
@@ -36,6 +39,8 @@ class RecipeContext
 
     public function publish(): void
     {
+        // [BẢN PHAO BẢO VỆ ĐỒ ÁN - STATE PATTERN]
+        // -> Context không tự xử lý mà "Ủy quyền" (Delegate) cho State hiện tại xử lý hành động publish.
         $this->state->publish($this);
     }
 

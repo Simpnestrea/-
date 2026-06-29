@@ -365,7 +365,12 @@ class AdminController extends Controller
     public function publishRecipe(Request $request, Recipe $recipe)
     {
         try {
+            // [BẢN PHAO BẢO VỆ ĐỒ ÁN - STATE PATTERN]
+            // -> "CONTEXT": Tạo một bộ bọc (Context) quanh cái Recipe hiện tại.
             $context = new \App\States\Recipe\RecipeContext($recipe);
+            
+            // -> "TRANSITION (Chuyển trạng thái)": Controller chỉ cần gọi hàm publish() của Context. 
+            // Bên trong, Context sẽ tự hiểu đang ở PendingState và PendingState sẽ tự chuyển sang ApprovedState.
             $context->publish();
             
             $message = "Đã duyệt công thức nấu ăn \"{$recipe->title}\" thành công!";

@@ -75,14 +75,14 @@ class RecipeController extends Controller
                     $stepImages[$index] = ['image' => $request->file("steps.{$index}.image") ?? null];
                 }
             }
-
-            // BUILDER PATTERN: Khởi tạo Recipe thông qua Builder
+            // -> ĐÂY LÀ "DIRECTOR": Thằng Controller đang đóng vai trò chỉ huy quá trình lắp ráp.
             $builder = new \App\Builders\RecipeBuilder();
             
+            // -> GỌI "BUILD PART": Director gọi các hàm này để lắp ráp từng bộ phận phức tạp của món ăn.
             $recipe = $builder->addBasicInfo($request->all(), $imageUrl)
                               ->addIngredients($request->ingredients)
                               ->addSteps($request->steps, $stepImages)
-                              ->build();
+                              ->build(); // -> "PRODUCT": Trả về đối tượng Model Recipe hoàn chỉnh.
 
             DB::commit();
 
