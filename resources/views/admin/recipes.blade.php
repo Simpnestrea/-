@@ -62,6 +62,7 @@
                         <th class="px-6 py-4">Người đăng</th>
                         <th class="px-6 py-4">Danh mục</th>
                         <th class="px-6 py-4 text-center">Độ khó / Thời gian</th>
+                        <th class="px-6 py-4 text-center">Trạng thái</th>
                         <th class="px-6 py-4 text-center">Lượt xem</th>
                         <th class="px-6 py-4 text-right">Thao tác</th>
                     </tr>
@@ -117,6 +118,17 @@
                                 </div>
                             </td>
 
+                            <!-- Status -->
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                @if($recipe->status === 'Approved')
+                                    <span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold status-badge">Đã duyệt</span>
+                                @elseif($recipe->status === 'Rejected')
+                                    <span class="bg-red-100 text-red-700 px-2.5 py-1 rounded-full text-xs font-bold status-badge">Từ chối</span>
+                                @else
+                                    <span class="bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full text-xs font-bold status-badge">Chờ duyệt</span>
+                                @endif
+                            </td>
+
                             <!-- Views -->
                             <td class="px-6 py-4 whitespace-nowrap text-center font-black text-slate-800 font-mono">
                                 {{ number_format($recipe->views_count) }}
@@ -130,6 +142,24 @@
                                     <button type="button" @click="showDetail({{ $recipe->id }})" class="bg-slate-50 hover:bg-slate-100 text-slate-750 font-bold px-3 py-1.5 rounded-lg border border-slate-200 text-xs transition">
                                         Xem chi tiết
                                     </button>
+
+                                    <!-- Approve Button -->
+                                    @if($recipe->status === 'Pending')
+                                    <form action="{{ route('admin.recipes.publish', $recipe) }}" method="POST" class="m-0 inline" @submit.prevent="updateStatus({{ $recipe->id }}, 'publish', $event)">
+                                        @csrf
+                                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold px-3 py-1.5 rounded-lg text-xs transition">
+                                            Duyệt
+                                        </button>
+                                    </form>
+
+                                    <!-- Reject Button -->
+                                    <form action="{{ route('admin.recipes.reject', $recipe) }}" method="POST" class="m-0 inline" @submit.prevent="updateStatus({{ $recipe->id }}, 'reject', $event)">
+                                        @csrf
+                                        <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold px-3 py-1.5 rounded-lg border border-red-200 text-xs transition">
+                                            Từ chối
+                                        </button>
+                                    </form>
+                                    @endif
 
                                     <!-- Delete Recipe Form -->
                                     <form action="{{ route('admin.recipes.delete', $recipe) }}" method="POST" class="m-0 inline" @submit.prevent="deleteRecipe({{ $recipe->id }}, $event)">
@@ -349,6 +379,35 @@
                         window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message, type: 'success' } }));
                     } else {
                         window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Xóa thất bại', type: 'error' } }));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Có lỗi xảy ra', type: 'error' } }));
+                });
+            },
+
+            updateStatus(recipeId, action, event) {
+                if(!confirm(`Bạn có chắc chắn muốn ${action === 'publish' ? 'duyệt' : 'từ chối'} công thức này?`)) return;
+                const form = event.target;
+                const url = form.action;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: data.message, type: 'success' } }));
+                        // Reload trang để cập nhật giao diện hoặc có thể update DOM trực tiếp (ở đây ta reload cho an toàn)
+                        setTimeout(() => window.location.reload(), 1000);
+                    } else {
+                        window.dispatchEvent(new CustomEvent('toast', { detail: { message: 'Thao tác thất bại', type: 'error' } }));
                     }
                 })
                 .catch(err => {

@@ -50,7 +50,7 @@
                             <template x-for="recipe in results" :key="recipe.id">
                                 <li>
                                     <a :href="`/recipe/${recipe.slug}`" class="flex items-center gap-4 px-5 py-3 hover:bg-orange-50/50 transition duration-150 group">
-                                        <img :src="recipe.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100'" 
+                                        <img :src="recipe.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100'" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=100';" 
                                              class="w-11 h-11 rounded-xl object-cover border border-gray-100 shrink-0 shadow-sm">
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm font-bold text-gray-800 group-hover:text-orange-500 transition truncate" x-text="recipe.title"></p>
@@ -141,7 +141,7 @@
                             <a href="{{ route('recipe.detail', $recipe->slug) }}"
                                class="group/card flex-none w-56 bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all flex flex-col relative">
                                 <div class="h-36 relative overflow-hidden shrink-0">
-                                    <img src="{{ $recipe->image }}" class="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" alt="{{ $recipe->title }}">
+                                    <img src="{{ $recipe->image }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800';" class="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" alt="{{ $recipe->title }}">
                                     <div class="absolute top-2 left-2 bg-amber-500 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shadow-sm">👑 {{ $recipe->category->name ?? 'Premium' }}</div>
                                     <div class="absolute bottom-2 right-2 bg-black/80 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm font-mono">{{ number_format($recipe->price, 0, ',', '.') }} đ</div>
                                 </div>
@@ -197,7 +197,7 @@
                             <a href="{{ route('recipe.detail', $recipe->slug) }}"
                                class="group/card flex-none w-56 bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all flex flex-col">
                                 <div class="h-36 relative overflow-hidden shrink-0">
-                                    <img src="{{ $recipe->image }}" class="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" alt="{{ $recipe->title }}">
+                                    <img src="{{ $recipe->image }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800';" class="absolute inset-0 w-full h-full object-cover group-hover/card:scale-110 transition-transform duration-500" alt="{{ $recipe->title }}">
                                     <div class="absolute top-2 left-2 bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-sm">{{ $recipe->category->name ?? 'Nổi Bật' }}</div>
                                 </div>
                                 <div class="p-4 flex flex-col flex-1">

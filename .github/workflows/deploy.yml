@@ -1,0 +1,45 @@
+name: Deploy Laravel to EC2
+
+on:
+  push:
+    branches:
+      - main # Chạy tự động khi có code push lên nhánh main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          cd ${{ secrets.EC2_TARGET_DIR }}
+          
+          # Cập nhật code mới nhất từ Github
+          git pull origin main
+          
+          # Cài đặt các thư viện PHP
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+          
+          # Build giao diện frontend
+          npm install
+          npm run build
+          
+          # Xóa cache cũ và tạo cache mới
+          php artisan optimize:clear
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          
+          # Chạy database migration (Cập nhật DB nếu có)
+          php artisan migrate --force
+          
+          # Restart Nginx hoặc PHP-FPM nếu cần (tùy chọn)
+          # sudo systemctl restart php8.4-fpm

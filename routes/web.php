@@ -227,6 +227,14 @@ Route::get('/recipe/{slug}', function ($slug) {
             }
         }
     ])->where('slug', $slug)->firstOrFail();
+
+    // Kiểm tra quyền xem bài viết chưa duyệt (Pending/Rejected)
+    if ($recipe->status !== 'Approved') {
+        if (!auth()->check() || (auth()->id() !== $recipe->user_id && !auth()->user()->is_admin)) {
+            abort(404, 'Bài viết không tồn tại hoặc đang chờ kiểm duyệt.');
+        }
+    }
+
     return view('recipe.detail', compact('recipe'));
 })->name('recipe.detail');
 

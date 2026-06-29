@@ -204,13 +204,32 @@
             </div>
         @endif
 
+        <!-- Thông báo trạng thái bài viết (Dành cho tác giả/Admin) -->
+        @if($recipe->status === 'Pending')
+            <div class="p-4 text-sm text-amber-800 rounded-2xl bg-amber-50 border border-amber-200 flex items-center gap-3 shadow-sm" role="alert">
+                <span class="text-xl">⏳</span>
+                <div>
+                    <span class="font-bold block">Bài viết đang chờ duyệt!</span>
+                    <span>Công thức này của bạn hiện đang ở trạng thái chờ duyệt. Chỉ có bạn và Admin mới có thể xem được trang này. Vui lòng đợi Admin phê duyệt để hiển thị công khai nhé!</span>
+                </div>
+            </div>
+        @elseif($recipe->status === 'Rejected')
+            <div class="p-4 text-sm text-red-800 rounded-2xl bg-red-50 border border-red-200 flex items-center gap-3 shadow-sm" role="alert">
+                <span class="text-xl">❌</span>
+                <div>
+                    <span class="font-bold block">Bài viết đã bị từ chối!</span>
+                    <span>Rất tiếc, công thức này không đáp ứng đủ tiêu chuẩn và đã bị Admin từ chối phê duyệt. Vui lòng chỉnh sửa lại nội dung cho phù hợp.</span>
+                </div>
+            </div>
+        @endif
+
         <div class="border border-gray-300 p-6 rounded-lg flex flex-col lg:flex-row gap-8">
             
             <div class="w-full lg:w-[350px] aspect-square bg-gray-50 border border-gray-300 flex items-center justify-center shrink-0 rounded overflow-hidden">
                 @if($recipe->image)
-                    <img src="{{ $recipe->image }}" alt="{{ $recipe->title }}" class="w-full h-full object-cover">
+                    <img src="{{ $recipe->image }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800';" alt="{{ $recipe->title }}" class="w-full h-full object-cover">
                 @else
-                    <svg class="w-24 h-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <img src="https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=800" alt="{{ $recipe->title }}" class="w-full h-full object-cover">
                 @endif
             </div>
 
@@ -251,10 +270,12 @@
 
                 <div class="flex items-center space-x-3 py-2">
                     @if($recipe->user->avatar)
-                        <img src="{{ str_contains($recipe->user->avatar, 'http') ? $recipe->user->avatar : Storage::url($recipe->user->avatar) }}" class="w-12 h-12 rounded-full border border-gray-200 object-cover">
+                        <img src="{{ str_contains($recipe->user->avatar, 'http') ? $recipe->user->avatar : Storage::url($recipe->user->avatar) }}" 
+                             onerror="this.outerHTML='<div class=\'w-12 h-12 rounded-full border border-gray-200 bg-orange-100 text-orange-600 font-bold flex items-center justify-center text-lg\'>{{ mb_substr($recipe->user->name, 0, 1) }}</div>'"
+                             class="w-12 h-12 rounded-full border border-gray-200 object-cover">
                     @else
                         <div class="w-12 h-12 rounded-full border border-gray-200 bg-orange-100 text-orange-600 font-bold flex items-center justify-center text-lg">
-                            {{ substr($recipe->user->name, 0, 1) }}
+                            {{ mb_substr($recipe->user->name, 0, 1) }}
                         </div>
                     @endif
                     <div class="space-y-1">
@@ -564,10 +585,12 @@
                 <form action="{{ route('comment.store', $recipe->id) }}" method="POST" class="flex items-center space-x-4">
                     @csrf
                     @if(auth()->user()->avatar)
-                        <img src="{{ str_contains(auth()->user()->avatar, 'http') ? auth()->user()->avatar : Storage::url(auth()->user()->avatar) }}" class="w-12 h-12 rounded-full border border-gray-300 object-cover shrink-0">
+                        <img src="{{ str_contains(auth()->user()->avatar, 'http') ? auth()->user()->avatar : Storage::url(auth()->user()->avatar) }}" 
+                             onerror="this.outerHTML='<div class=\'w-12 h-12 rounded-full border border-gray-300 bg-orange-100 text-orange-600 font-bold flex items-center justify-center shrink-0\'>{{ mb_substr(auth()->user()->name, 0, 1) }}</div>'"
+                             class="w-12 h-12 rounded-full border border-gray-300 object-cover shrink-0">
                     @else
                         <div class="w-12 h-12 rounded-full border border-gray-300 bg-orange-100 text-orange-600 font-bold flex items-center justify-center shrink-0">
-                            {{ substr(auth()->user()->name, 0, 1) }}
+                            {{ mb_substr(auth()->user()->name, 0, 1) }}
                         </div>
                     @endif
                     <input type="text" name="content" class="flex-1 border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition" placeholder="Bạn nghĩ gì về món này..." required>
@@ -663,10 +686,12 @@
                     x-transition
                     class="flex gap-4 p-4 bg-gray-50/50 rounded-2xl border border-gray-100 hover:border-orange-100 transition-all">
                         @if($comment->user->avatar)
-                            <img src="{{ str_contains($comment->user->avatar, 'http') ? $comment->user->avatar : Storage::url($comment->user->avatar) }}" class="w-10 h-10 rounded-full border border-gray-200 object-cover shrink-0">
+                            <img src="{{ str_contains($comment->user->avatar, 'http') ? $comment->user->avatar : Storage::url($comment->user->avatar) }}" 
+                                 onerror="this.outerHTML='<div class=\'w-10 h-10 rounded-full border border-gray-200 bg-orange-100 text-orange-600 font-bold flex items-center justify-center shrink-0 text-sm\'>{{ mb_substr($comment->user->name, 0, 1) }}</div>'"
+                                 class="w-10 h-10 rounded-full border border-gray-200 object-cover shrink-0">
                         @else
                             <div class="w-10 h-10 rounded-full border border-gray-200 bg-orange-100 text-orange-600 font-bold flex items-center justify-center shrink-0 text-sm">
-                                {{ substr($comment->user->name, 0, 1) }}
+                                {{ mb_substr($comment->user->name, 0, 1) }}
                             </div>
                         @endif
                         <div class="flex-1 space-y-1">
